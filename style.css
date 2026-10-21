@@ -97,3 +97,7 @@ section{margin-top:28px}
 
 .btab{font-size:11px;padding:6px 2px}
 .btab .badge{margin-left:2px;padding:0 5px;min-width:18px;font-size:11px}
+
+/* Menu bawah: badge jadi bulatan di pojok ikon, label tetap sejajar */
+.btab b{position:relative;display:inline-block}
+.btab b .badge{position:absolute;top:-6px;left:100%;margin:0 0 0 -8px;min-width:18px;padding:0 5px;line-height:18px;height:18px;font-size:11px}
