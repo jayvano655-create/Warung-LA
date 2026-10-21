@@ -1,7 +1,7 @@
 /* LOGIKA: keranjang, favorit, pencarian, filter, checkout WhatsApp.
    Dimuat setelah produk.js, jadi bisa memakai WARUNG dan PRODUK. */
 // ============ STATE & PENYIMPANAN ============
-var state = {view:"home", detailId:null, q:"", kat:"Semua", fav:[], cart:{}, nama:"", catatan:""};
+var state = {view:"home", detailId:null, q:"", kat:"Semua", fav:[], cart:{}, nama:"", catatan:"", ask:false, ordered:false};
 function load(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 state.fav = load("wd_fav",[]); state.cart = load("wd_cart",{});
@@ -69,6 +69,7 @@ function vCart(){
     '<div class="qty"><button data-add="'+p.id+'" data-d="-1" aria-label="Kurangi '+p.nama+'">−</button><span>'+n+'</span><button data-add="'+p.id+'" data-d="1" aria-label="Tambah '+p.nama+'">+</button></div></div>'}).join("");
   return '<h1 style="font-size:28px;margin-bottom:12px">Keranjang</h1>'+rows+
   '<div class="total"><span>Total</span><span class="price" id="tot">'+rp(cartTotal())+'</span></div>'+
+  (state.ask?'<div class="form" style="border-color:var(--orange);margin:8px 0 0"><b>'+(state.ordered?'Sudah kirim pesanan lewat WhatsApp?':'Kosongkan semua isi keranjang?')+'</b><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-clear="1">Ya, kosongkan</button><button class="btn line" data-keep="1">'+(state.ordered?'Belum, tetap simpan':'Batal')+'</button></div></div>':'<button class="link" data-ask="1">Kosongkan keranjang</button>')+
   '<div class="form"><label for="nama">Nama kamu</label><input id="nama" placeholder="Contoh: Budi" value="'+state.nama.replace(/"/g,"&quot;")+'">'+
   '<label for="cat">Catatan pesanan</label><textarea id="cat" rows="3" placeholder="Contoh: kurang pedas, diambil jam 12">'+state.catatan.replace(/</g,"&lt;")+'</textarea>'+
   '<a class="btn wa block" id="waBtn" href="'+waLink()+'" target="_blank" rel="noopener">Pesan lewat WhatsApp</a>'+
@@ -92,7 +93,7 @@ var NAV=[["home","Beranda","⌂"],["produk","Menu","▦"],["fav","Favorit","♡"
 function renderNav(){
   var cur=state.view==="detail"?"produk":state.view;
   document.getElementById("topnav").innerHTML=NAV.map(function(n){return '<button data-go="'+n[0]+'" aria-current="'+(cur===n[0])+'">'+n[1]+(n[0]==="cart"&&cartCount()?'<span class="badge">'+cartCount()+'</span>':'')+(n[0]==="fav"&&state.fav.length?'<span class="badge">'+state.fav.length+'</span>':'')+'</button>'}).join("");
-  var b=[NAV[0],NAV[1],NAV[2],NAV[3]];
+  var b=NAV;
   document.getElementById("btabs").innerHTML=b.map(function(n){var c=n[0]==="cart"?cartCount():n[0]==="fav"?state.fav.length:0;
     return '<button class="btab" data-go="'+n[0]+'" aria-current="'+(cur===n[0])+'"><b>'+n[2]+'</b><span>'+n[1]+(c?'<span class="badge">'+c+'</span>':'')+'</span></button>'}).join("");
 }
@@ -103,12 +104,16 @@ function render(){
 
 // ============ EVENT ============
 document.addEventListener("click",function(e){
-  var t=e.target.closest("[data-go],[data-detail],[data-fav],[data-add],[data-kat],[data-homekat]");if(!t)return;
+  if(e.target.closest("#waBtn")){setTimeout(function(){state.ordered=true;state.ask=true;render()},500);return}
+  var t=e.target.closest("[data-go],[data-detail],[data-fav],[data-add],[data-kat],[data-homekat],[data-ask],[data-clear],[data-keep]");if(!t)return;
   if(t.dataset.go){go(t.dataset.go)}
   else if(t.dataset.detail){go("detail",+t.dataset.detail)}
   else if(t.dataset.fav){toggleFav(+t.dataset.fav);var y=window.scrollY;render();window.scrollTo(0,y)}
   else if(t.dataset.add){var d=t.dataset.d?+t.dataset.d:1;addCart(+t.dataset.add,d);
     if(state.view==="cart"){var y2=window.scrollY;render();window.scrollTo(0,y2)}else{renderNav();toast("Masuk keranjang")}}
+  else if(t.dataset.ask){state.ask=true;state.ordered=false;render()}
+  else if(t.dataset.keep){state.ask=false;state.ordered=false;render()}
+  else if(t.dataset.clear){state.cart={};save("wd_cart",state.cart);state.catatan="";state.ask=false;state.ordered=false;toast("Keranjang dikosongkan");render()}
   else if(t.dataset.kat){state.kat=t.dataset.kat;render()}
   else if(t.dataset.homekat){state.kat=t.dataset.homekat;go("produk")}
 });

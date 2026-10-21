@@ -28,7 +28,7 @@ button{font:inherit;color:inherit;cursor:pointer}
 .top nav button,.btab{background:none;border:0;padding:8px 12px;border-radius:10px;color:var(--muted);font-weight:500}
 .top nav button[aria-current="true"]{color:var(--green);background:var(--tint);font-weight:700}
 .badge{display:inline-block;min-width:20px;padding:0 6px;border-radius:99px;background:var(--orange);color:var(--on-orange);font-size:12px;font-weight:700;text-align:center;margin-left:4px}
-.btabs{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(4,1fr);background:var(--surface);border-top:1px solid var(--line);
+.btabs{position:fixed;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);
   padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px));z-index:5}
 .btab{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:12px;padding:6px 4px}
 .btab b{font-size:20px;line-height:1;font-weight:400}
@@ -94,3 +94,6 @@ section{margin-top:28px}
 /* Foto produk mengisi kotak gambar */
 .pic img,.em img{width:100%;height:100%;object-fit:cover;display:block}
 .pic{overflow:hidden}.row .em{overflow:hidden}
+
+.btab{font-size:11px;padding:6px 2px}
+.btab .badge{margin-left:2px;padding:0 5px;min-width:18px;font-size:11px}
