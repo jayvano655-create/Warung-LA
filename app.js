@@ -64,7 +64,7 @@ function vCart(){
     '<div class="qty"><button data-add="'+p.id+'" data-d="-1" aria-label="Kurangi '+p.nama+'">−</button><span>'+n+'</span><button data-add="'+p.id+'" data-d="1" aria-label="Tambah '+p.nama+'">+</button></div></div>'}).join("");
   return '<h1 style="font-size:28px;margin-bottom:12px">Keranjang</h1>'+rows+
   '<div class="total"><span>Total</span><span class="price" id="tot">'+rp(cartTotal())+'</span></div>'+
-  (state.ask?'<div class="form" style="border:2px solid var(--orange);margin:8px 0 0"><b>'+(state.ordered?'Sudah kirim pesanan lewat WhatsApp?':'Kosongkan semua isi keranjang?')+'</b><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-clear="1">Ya, kosongkan</button><button class="btn line" data-keep="1">'+(state.ordered?'Belum, tetap simpan':'Batal')+'</button></div></div>':'<button class="link" data-ask="1">Kosongkan keranjang</button>')+
+  (state.ask?'<div class="form" style="border:2px solid var(--accent);margin:8px 0 0"><b>'+(state.ordered?'Sudah kirim pesanan lewat WhatsApp?':'Kosongkan semua isi keranjang?')+'</b><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" data-clear="1">Ya, kosongkan</button><button class="btn line" data-keep="1">'+(state.ordered?'Belum, tetap simpan':'Batal')+'</button></div></div>':'<button class="link" data-ask="1">Kosongkan keranjang</button>')+
   '<div class="form"><label for="nama">Nama kamu</label><input id="nama" placeholder="Contoh: Budi" value="'+state.nama.replace(/"/g,"&quot;")+'">'+
   '<label for="cat">Catatan pesanan</label><textarea id="cat" rows="3" placeholder="Contoh: kurang pedas, diambil jam 12">'+state.catatan.replace(/</g,"&lt;")+'</textarea>'+
   '<a class="btn wa block" id="waBtn" href="'+waLink()+'" target="_blank" rel="noopener">Pesan lewat WhatsApp</a>'+
@@ -98,7 +98,23 @@ function render(){
 }
 
 // ============ EVENT ============
+// ============ TEMA TERANG / GELAP ============
+var IKON_BULAN='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+var IKON_MATAHARI='<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+function temaSekarang(){return document.documentElement.getAttribute("data-theme")==="dark"?"dark":"light"}
+function ikonTema(){
+  var b=document.getElementById("themeBtn");if(!b)return;
+  var gelap=temaSekarang()==="dark";
+  b.innerHTML=gelap?IKON_MATAHARI:IKON_BULAN;
+  b.setAttribute("aria-label",gelap?"Ganti ke mode terang":"Ganti ke mode gelap");
+}
 document.addEventListener("click",function(e){
+  if(e.target.closest("#themeBtn")){
+    var t=temaSekarang()==="dark"?"light":"dark";
+    document.documentElement.setAttribute("data-theme",t);
+    try{localStorage.setItem("wd_theme",t)}catch(err){}
+    ikonTema();return;
+  }
   if(e.target.closest("#waBtn")){setTimeout(function(){state.ordered=true;state.ask=true;render()},500);return}
   var t=e.target.closest("[data-go],[data-detail],[data-fav],[data-add],[data-kat],[data-homekat],[data-ask],[data-clear],[data-keep]");if(!t)return;
   if(t.dataset.go){go(t.dataset.go)}
@@ -118,4 +134,5 @@ document.addEventListener("input",function(e){
   if(e.target.id==="cat"){state.catatan=e.target.value;document.getElementById("waBtn").href=waLink()}
 });
 document.getElementById("brandName").textContent=WARUNG.nama;
+ikonTema();
 render();
