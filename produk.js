@@ -1,10 +1,7 @@
 /* DATA WARUNG: ini satu-satunya file yang biasanya perlu kamu edit.
    - WARUNG: nama, nomor WhatsApp, jam buka, alamat
    - PRODUK: tambah/ubah/hapus produk (id harus unik)
-   - gambar: bisa emoji (sementara) ATAU nama file foto.
-     Cara pakai foto: buat folder "img" di samping index.html, taruh foto di situ,
-     lalu tulis misalnya  gambar:"img/nasi-goreng.jpg"
-     Tips: foto berbentuk landscape (4:3), ukuran di bawah 300 KB supaya cepat dibuka. */
+   - tiap menu: id (harus unik), nama, harga, kategori, desc (deskripsi singkat) */
 // ============ PENGATURAN WARUNG (ganti di sini) ============
 var WARUNG = {
   nama: "Warung LA",
@@ -15,20 +12,20 @@ var WARUNG = {
 };
 // ============ DATA MENU: id, nama, harga, kategori, gambar ============
 var PRODUK = [
-  {id:1,nama:"Nasi Goreng Spesial",harga:18000,kategori:"Makanan Utama",gambar:"🍛",desc:"Nasi goreng dengan telur, ayam suwir, dan acar."},
-  {id:2,nama:"Soto Ayam",harga:16000,kategori:"Makanan Utama",gambar:"🍲",desc:"Soto ayam kuah kuning hangat, sudah termasuk nasi."},
-  {id:3,nama:"Mie Ayam Bakso",harga:15000,kategori:"Makanan Utama",gambar:"🍜",desc:"Mie ayam dengan dua bakso dan pangsit goreng."},
-  {id:4,nama:"Gado-gado",harga:14000,kategori:"Makanan Utama",gambar:"🥗",desc:"Sayur rebus, tahu, tempe, lontong, bumbu kacang."},
-  {id:5,nama:"Ayam Goreng",harga:15000,kategori:"Lauk",gambar:"🍗",desc:"Ayam goreng bumbu kuning, satu potong, plus sambal."},
-  {id:6,nama:"Sate Ayam 10 Tusuk",harga:20000,kategori:"Lauk",gambar:"🍢",desc:"Sate ayam bumbu kacang, disajikan dengan lontong."},
-  {id:7,nama:"Tahu Tempe Goreng",harga:6000,kategori:"Lauk",gambar:"🍘",desc:"Tahu dan tempe goreng, isi 4 potong."},
-  {id:8,nama:"Nasi Putih",harga:4000,kategori:"Lauk",gambar:"🍚",desc:"Nasi putih hangat, satu porsi."},
-  {id:9,nama:"Es Teh Manis",harga:4000,kategori:"Minuman",gambar:"🧋",desc:"Teh manis dingin, gelas besar."},
-  {id:10,nama:"Es Jeruk",harga:6000,kategori:"Minuman",gambar:"🍊",desc:"Jeruk peras segar dengan es batu."},
-  {id:11,nama:"Kopi Susu",harga:10000,kategori:"Minuman",gambar:"☕",desc:"Kopi susu gula aren, panas atau dingin."},
-  {id:12,nama:"Air Mineral",harga:4000,kategori:"Minuman",gambar:"💧",desc:"Air mineral botol 600 ml."},
-  {id:13,nama:"Pisang Goreng",harga:8000,kategori:"Camilan",gambar:"🍌",desc:"Pisang goreng krispi, isi 5 potong."},
-  {id:14,nama:"Kerupuk",harga:3000,kategori:"Camilan",gambar:"🥠",desc:"Kerupuk putih, satu bungkus kecil."},
-  {id:15,nama:"Es Campur",harga:12000,kategori:"Camilan",gambar:"🍧",desc:"Es campur dengan cincau, kolang-kaling, dan susu."}
+  {id:1,nama:"Nasi Goreng Spesial",harga:18000,kategori:"Makanan Utama",desc:"Nasi goreng dengan telur, ayam suwir, dan acar."},
+  {id:2,nama:"Soto Ayam",harga:16000,kategori:"Makanan Utama",desc:"Soto ayam kuah kuning hangat, sudah termasuk nasi."},
+  {id:3,nama:"Mie Ayam Bakso",harga:15000,kategori:"Makanan Utama",desc:"Mie ayam dengan dua bakso dan pangsit goreng."},
+  {id:4,nama:"Gado-gado",harga:14000,kategori:"Makanan Utama",desc:"Sayur rebus, tahu, tempe, lontong, bumbu kacang."},
+  {id:5,nama:"Ayam Goreng",harga:15000,kategori:"Lauk",desc:"Ayam goreng bumbu kuning, satu potong, plus sambal."},
+  {id:6,nama:"Sate Ayam 10 Tusuk",harga:20000,kategori:"Lauk",desc:"Sate ayam bumbu kacang, disajikan dengan lontong."},
+  {id:7,nama:"Tahu Tempe Goreng",harga:6000,kategori:"Lauk",desc:"Tahu dan tempe goreng, isi 4 potong."},
+  {id:8,nama:"Nasi Putih",harga:4000,kategori:"Lauk",desc:"Nasi putih hangat, satu porsi."},
+  {id:9,nama:"Es Teh Manis",harga:4000,kategori:"Minuman",desc:"Teh manis dingin, gelas besar."},
+  {id:10,nama:"Es Jeruk",harga:6000,kategori:"Minuman",desc:"Jeruk peras segar dengan es batu."},
+  {id:11,nama:"Kopi Susu",harga:10000,kategori:"Minuman",desc:"Kopi susu gula aren, panas atau dingin."},
+  {id:12,nama:"Air Mineral",harga:4000,kategori:"Minuman",desc:"Air mineral botol 600 ml."},
+  {id:13,nama:"Pisang Goreng",harga:8000,kategori:"Camilan",desc:"Pisang goreng krispi, isi 5 potong."},
+  {id:14,nama:"Kerupuk",harga:3000,kategori:"Camilan",desc:"Kerupuk putih, satu bungkus kecil."},
+  {id:15,nama:"Es Campur",harga:12000,kategori:"Camilan",desc:"Es campur dengan cincau, kolang-kaling, dan susu."}
 ];
 var KATEGORI = ["Semua","Makanan Utama","Lauk","Minuman","Camilan"];
