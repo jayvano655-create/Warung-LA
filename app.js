@@ -5,6 +5,12 @@ var state = {view:"home", detailId:null, q:"", kat:"Semua", fav:[], cart:{}, nam
 function load(k,def){try{var v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}}
 function save(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
 state.fav = load("wd_fav",[]); state.cart = load("wd_cart",{});
+// Buka/tutup mengikuti jam WIB (UTC+7), dibaca dari WARUNG.bukaPukul dan WARUNG.tutupPukul
+function menit(s){var h=s.split(":");return (+h[0])*60+(+h[1])}
+function sedangBuka(){
+  var d=new Date(), m=((d.getUTCHours()+7)%24)*60+d.getUTCMinutes();
+  return m>=menit(WARUNG.bukaPukul)&&m<menit(WARUNG.tutupPukul);
+}
 var rp = function(n){return "Rp"+n.toLocaleString("id-ID")};
 var byId = function(id){return PRODUK.find(function(p){return p.id===id})};
 function cartCount(){return Object.keys(state.cart).reduce(function(s,k){return s+state.cart[k]},0)}
@@ -19,13 +25,15 @@ function go(v,id){state.view=v;if(id)state.detailId=id;render();window.scrollTo(
 
 // ============ TAMPILAN ============
 function card(p){
-  var f=state.fav.indexOf(p.id)>=0;
-  return '<article class="card"><div class="info"><div class="toprow"><span class="cat">'+p.kategori+'</span>'+
-  '<button class="heart" data-fav="'+p.id+'" aria-pressed="'+f+'" aria-label="Favorit '+p.nama+'">'+(f?"♥":"♡")+'</button></div>'+
-  '<button class="name" data-detail="'+p.id+'">'+p.nama+'</button>'+
-  '<span class="price">'+rp(p.harga)+'</span><button class="btn green" data-add="'+p.id+'">+ Keranjang</button></div></article>';
+  var f=state.fav.indexOf(p.id)>=0, n=state.cart[String(p.id)]||0;
+  var aksi=n
+    ?'<div class="qty"><button data-add="'+p.id+'" data-d="-1" aria-label="Kurangi '+p.nama+'">−</button><span>'+n+'</span><button data-add="'+p.id+'" data-d="1" aria-label="Tambah '+p.nama+'">+</button></div>'
+    :'<button class="btn add" data-add="'+p.id+'" aria-label="Tambah '+p.nama+' ke keranjang">Tambah</button>';
+  return '<article class="item"><div class="item-main"><span class="cat">'+p.kategori+'</span>'+
+  '<button class="name" data-detail="'+p.id+'">'+p.nama+'</button><p class="desc">'+p.desc+'</p><span class="price">'+rp(p.harga)+'</span></div>'+
+  '<div class="item-side"><button class="heart" data-fav="'+p.id+'" aria-pressed="'+f+'" aria-label="Favorit '+p.nama+'">'+(f?"♥":"♡")+'</button>'+aksi+'</div></article>';
 }
-function grid(list,emptyMsg){return list.length?'<div class="grid">'+list.map(card).join("")+'</div>':'<div class="empty">'+emptyMsg+'</div>'}
+function grid(list,emptyMsg){return list.length?'<div class="list">'+list.map(card).join("")+'</div>':'<div class="empty">'+emptyMsg+'</div>'}
 function filtered(){
   var q=state.q.trim().toLowerCase();
   return PRODUK.filter(function(p){return (state.kat==="Semua"||p.kategori===state.kat)&&(!q||p.nama.toLowerCase().indexOf(q)>=0||p.kategori.toLowerCase().indexOf(q)>=0)});
@@ -33,7 +41,11 @@ function filtered(){
 function chips(){return '<div class="chips" role="group" aria-label="Filter kategori">'+KATEGORI.map(function(k){return '<button class="chip" data-kat="'+k+'" aria-pressed="'+(state.kat===k)+'">'+k+'</button>'}).join("")+'</div>'}
 
 function vHome(){
-  return '<div class="hero"><h1>Lapar? Pesan makanan favoritmu lewat WhatsApp.</h1><p>Pilih menu, masukkan ke keranjang, lalu kirim pesanan ke kami. Pesanan diambil langsung di warung.</p><button class="btn" data-go="produk">Lihat menu</button></div>'+
+  var buka=sedangBuka();
+  return '<section class="info-card"><h1>Mau makan apa hari ini?</h1>'+
+  '<div class="status"><span class="pill '+(buka?'on':'off')+'">'+(buka?'Buka':'Tutup')+'</span><span>'+WARUNG.jam+'</span></div>'+
+  '<p class="note" style="margin:6px 0 0">'+WARUNG.alamat+'. '+(buka?'Pesanan diambil langsung di warung.':'Sedang tutup, kamu tetap bisa menyusun pesanan.')+'</p></section>'+
+  '<button class="searchfake" data-go="produk" data-focus="1">Cari menu, misal: soto</button>'+
   '<section><div class="sec-h"><h2>Kategori</h2></div>'+chips().replace(/data-kat/g,'data-homekat')+'</section>'+
   '<section><div class="sec-h"><h2>Menu pilihan</h2><button class="link" data-go="produk">Lihat semua</button></div>'+grid(PRODUK.slice(0,8))+'</section>';
 }
@@ -79,9 +91,13 @@ function waLink(){
   if(state.catatan.trim())t+="\nCatatan: "+state.catatan.trim();
   return "https://wa.me/"+WARUNG.nomorWA+"?text="+encodeURIComponent(t);
 }
+function linkPeta(){
+  return WARUNG.peta||("https://www.google.com/maps/search/?api=1&query="+encodeURIComponent(WARUNG.nama+", "+WARUNG.alamat));
+}
 function vAbout(){
   return '<div class="about"><h1 style="font-size:28px;margin-bottom:12px">Tentang kami</h1><p>'+WARUNG.nama+' melayani warga sekitar, pelanggan tetap, mahasiswa, dan pekerja di sekitar lokasi. Pesan lebih dulu dari rumah atau kantor, makanan kami siapkan sesuai pesananmu dan kamu ambil langsung di warung.</p>'+
-  '<div class="facts"><div class="fact"><b>Jam buka</b>'+WARUNG.jam+'</div><div class="fact"><b>Alamat</b>'+WARUNG.alamat+'</div><div class="fact"><b>Pengambilan</b>'+WARUNG.area+'</div><div class="fact"><b>WhatsApp</b>+'+WARUNG.nomorWA+'</div></div></div>';
+  '<div class="facts"><div class="fact"><b>Jam buka</b>'+WARUNG.jam+'</div><div class="fact"><b>Alamat</b>'+WARUNG.alamat+'</div><div class="fact"><b>Pengambilan</b>'+WARUNG.area+'</div><div class="fact"><b>WhatsApp</b>+'+WARUNG.nomorWA+'</div></div>'+
+  '<a class="btn green" href="'+linkPeta()+'" target="_blank" rel="noopener" style="margin-top:16px">Buka di Google Maps</a></div>';
 }
 
 var NAV=[["home","Beranda","⌂"],["produk","Menu","▦"],["fav","Favorit","♡"],["cart","Keranjang","🛒"],["about","Tentang","ⓘ"]];
@@ -89,6 +105,8 @@ function renderNav(){
   var cur=state.view==="detail"?"produk":state.view;
   document.getElementById("topnav").innerHTML=NAV.map(function(n){return '<button data-go="'+n[0]+'" aria-current="'+(cur===n[0])+'">'+n[1]+(n[0]==="cart"&&cartCount()?'<span class="badge">'+cartCount()+'</span>':'')+(n[0]==="fav"&&state.fav.length?'<span class="badge">'+state.fav.length+'</span>':'')+'</button>'}).join("");
   var b=NAV;
+  var cb=document.getElementById("cartbar"), jml=cartCount();
+  if(jml&&state.view!=="cart"){cb.hidden=false;cb.innerHTML='<span>'+jml+' item · '+rp(cartTotal())+'</span><b>Lihat keranjang →</b>'}else{cb.hidden=true}
   document.getElementById("btabs").innerHTML=b.map(function(n){var c=n[0]==="cart"?cartCount():n[0]==="fav"?state.fav.length:0;
     return '<button class="btab" data-go="'+n[0]+'" aria-current="'+(cur===n[0])+'"><b>'+n[2]+(c?'<span class="badge">'+c+'</span>':'')+'</b><span>'+n[1]+'</span></button>'}).join("");
 }
@@ -117,11 +135,11 @@ document.addEventListener("click",function(e){
   }
   if(e.target.closest("#waBtn")){setTimeout(function(){state.ordered=true;state.ask=true;render()},500);return}
   var t=e.target.closest("[data-go],[data-detail],[data-fav],[data-add],[data-kat],[data-homekat],[data-ask],[data-clear],[data-keep]");if(!t)return;
-  if(t.dataset.go){go(t.dataset.go)}
+  if(t.dataset.go){go(t.dataset.go);if(t.dataset.focus){var q=document.getElementById("q");if(q)q.focus()}}
   else if(t.dataset.detail){go("detail",+t.dataset.detail)}
   else if(t.dataset.fav){toggleFav(+t.dataset.fav);var y=window.scrollY;render();window.scrollTo(0,y)}
   else if(t.dataset.add){var d=t.dataset.d?+t.dataset.d:1;addCart(+t.dataset.add,d);
-    if(state.view==="cart"){var y2=window.scrollY;render();window.scrollTo(0,y2)}else{renderNav();toast("Masuk keranjang")}}
+    var y2=window.scrollY;render();window.scrollTo(0,y2);if(state.view==="detail")toast("Masuk keranjang")}
   else if(t.dataset.ask){state.ask=true;state.ordered=false;render()}
   else if(t.dataset.keep){state.ask=false;state.ordered=false;render()}
   else if(t.dataset.clear){state.cart={};save("wd_cart",state.cart);state.catatan="";state.ask=false;state.ordered=false;toast("Keranjang dikosongkan");render()}

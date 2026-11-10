@@ -7,7 +7,10 @@ var WARUNG = {
   nama: "Warung LA",
   nomorWA: "6281331708609",   // format internasional tanpa + dan tanpa 0 di depan
   jam: "06.00 - 15.00 WIB",
+  bukaPukul: "06:00",   // dipakai untuk penanda Buka/Tutup (format jam:menit, waktu WIB)
+  tutupPukul: "15:00",
   alamat: "Jl. Ahmad Yani No. 24, Kepanjen, Malang",
+  peta: "",   // isi dengan link Google Maps dari tombol Bagikan; kosong = pencarian otomatis dari nama dan alamat
   area: "Pesan lewat WhatsApp, lalu ambil langsung di warung"
 };
 // ============ DATA MENU: id, nama, harga, kategori, gambar ============
